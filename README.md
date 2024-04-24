@@ -23,3 +23,12 @@ Please refer to the [Contribution](https://retejs.org/docs/contribution) guide
 ## License
 
 [CC BY-NC-SA 4.0](./LICENSE)
+
+## 修改目标
+该库在解决一些问题时，存在缺陷，为此目标产生了本个fork。
+
+## CHANGELOG
+### 24.4.23 解决即使提供了exclude方法，但是节点仍然可以被添加进被exclude的节点中的问题
+通过这个修改，在传入exclude方法后，不能被添加子元素的node将不再对长按拖放做出视觉和逻辑响应
+### 24.4.24 exclude方法在该插件中本身有其他用途，将我们之前写的exclude改为elder
+修改了之前exclude逻辑修改造成的父级尺寸计算的错误

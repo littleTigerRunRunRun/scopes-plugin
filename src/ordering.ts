@@ -3,7 +3,10 @@ import { BaseArea, BaseAreaPlugin } from 'rete-area-plugin'
 
 import { ExpectedScheme } from './types'
 
-type Props<T> = { editor: NodeEditor<ExpectedScheme>, area: BaseAreaPlugin<ExpectedScheme, BaseArea<ExpectedScheme> | T> }
+type Props<T> = {
+  editor: NodeEditor<ExpectedScheme>,
+  area: BaseAreaPlugin<ExpectedScheme, BaseArea<ExpectedScheme> | T>
+}
 
 function bringConnectionForward<T>(id: ConnectionId, props: Props<T>) {
   const view = props.area.connectionViews.get(id)
@@ -43,7 +46,7 @@ function bringForward<T>(nodeId: NodeId, props: Props<T>) {
 export function useOrdering<T>(props: Props<T>) {
   // eslint-disable-next-line max-statements
   props.area.addPipe(async context => {
-    if (!('type' in context)) return context
+    if (!(context instanceof Object) || !('type' in context)) return context
     if (context.type === 'nodepicked') {
       bringForward(context.data.id, props)
     }

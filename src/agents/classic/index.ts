@@ -45,7 +45,7 @@ export const useScopeAgent: ScopeAgent = (params: DefaultScopesAgentParams, { ar
   }
 
   area.addPipe(async context => {
-    if (!('type' in context)) return context
+    if (!(context instanceof Object) || !('type' in context)) return context
     if (context.type === 'nodepicked') {
       pick(context.data.id)
     }
@@ -56,19 +56,22 @@ export const useScopeAgent: ScopeAgent = (params: DefaultScopesAgentParams, { ar
       const { pointer } = area.area
       const ids = release()
 
+      if (ids.length === 0) return
+
       await reassignParent(ids, pointer, params, { area, editor })
     }
     return context
   })
 }
 
-export function useVisualEffects<T>({ area, editor, scopes }: AgentContext<T>): void {
+export function useVisualEffects<T>(params: DefaultScopesAgentParams, { area, editor, scopes }: AgentContext<T>): void {
   const pickedNodes = getPickedNodes(scopes)
   let previousHighlighted: string | null = null
   let clientPointerPostion: Position | null = null
 
   // eslint-disable-next-line max-statements
   function updateHighlightedScopes(position: { x: number, y: number }, nodes: NodeId[]) {
+    // 如果先前有高亮对象，先取消其高亮
     if (previousHighlighted) {
       const view = area.nodeViews.get(previousHighlighted)
 
@@ -78,7 +81,9 @@ export function useVisualEffects<T>({ area, editor, scopes }: AgentContext<T>): 
     if (nodes.length) {
       const { x, y } = position
       const elements = document.elementsFromPoint(x, y)
-      const nodeViews = editor.getNodes().map(node => {
+      const nodeViews = editor.getNodes().filter(node => {
+        return params.elder(node.id)
+      }).map(node => {
         const view = area.nodeViews.get(node.id)
 
         if (!view) throw new Error('view')
@@ -95,6 +100,7 @@ export function useVisualEffects<T>({ area, editor, scopes }: AgentContext<T>): 
 
       const nonSelected = intersectedNodes
         .filter(item => !item.node.selected)
+      // 从交互点出发，找到画布中交互点位置上的节点们，然后和画布中记录的节点做比对，找出交叉内容，之后剔除选中（正在拖拽的）的内容后，第一个交互点就是会进行拖入操作的。
       const first = nonSelected[0]
 
       if (first) {
@@ -108,22 +114,28 @@ export function useVisualEffects<T>({ area, editor, scopes }: AgentContext<T>): 
     if (context.type === 'scopepicked') {
       const { ids } = context.data
 
+      // 未选中的节点统统改为虚化（opacity=0.4)
       editor.getNodes().filter(n => !ids.includes(n.id)).forEach(node => {
         const view = area.nodeViews.get(node.id)
 
         if (view) view.element.style.opacity = '0.4'
       })
-      if (clientPointerPostion) updateHighlightedScopes(clientPointerPostion, pickedNodes)
+      if (clientPointerPostion) {
+        updateHighlightedScopes(clientPointerPostion, pickedNodes)
+      }
     }
     if (context.type === 'scopereleased') {
       const { ids } = context.data
 
+      // 未选中的节点统统解除虚化（opacity='')
       editor.getNodes().filter(n => !ids.includes(n.id)).forEach(node => {
         const view = area.nodeViews.get(node.id)
 
         if (view) view.element.style.opacity = ''
       })
-      if (clientPointerPostion) updateHighlightedScopes(clientPointerPostion, pickedNodes)
+      if (clientPointerPostion) {
+        updateHighlightedScopes(clientPointerPostion, pickedNodes)
+      }
     }
     if (context.type === 'pointermove') {
       clientPointerPostion = {

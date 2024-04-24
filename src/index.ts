@@ -21,6 +21,8 @@ export type Props = {
   exclude?: (id: NodeId) => boolean
   /** Customizes the size of the node which is recognized as a parent. Default is `(id, size) => size` */
   size?: (id: NodeId, size: Size) => Size
+  /** 决定这个目标节点是否具备父级能力 */
+  elder?: (id: NodeId) => boolean
 }
 
 type Requires<Schemes extends ExpectedScheme> =
@@ -42,9 +44,12 @@ export type Scopes =
  * @emits scopepicked
  * @emits scopereleased
  */
-export class ScopesPlugin<Schemes extends ExpectedScheme, T = never> extends Scope<Scopes, [Requires<Schemes>, Root<Schemes>]> {
+export class ScopesPlugin<
+  Schemes extends ExpectedScheme, T = never
+> extends Scope<Scopes, [Requires<Schemes>, Root<Schemes>]> {
   padding: (id: NodeId) => Padding
   exclude: (id: NodeId) => boolean
+  elder: (id: NodeId) => boolean
   size: (id: NodeId, size: Size) => Size
   editor!: NodeEditor<Schemes>
   area!: BaseAreaPlugin<Schemes, T>
@@ -60,6 +65,7 @@ export class ScopesPlugin<Schemes extends ExpectedScheme, T = never> extends Sco
     }))
     this.exclude = props?.exclude || (() => false)
     this.size = props?.size || ((id, size) => size)
+    this.elder = props?.elder || (() => true)
   }
 
   // eslint-disable-next-line max-statements
@@ -70,10 +76,10 @@ export class ScopesPlugin<Schemes extends ExpectedScheme, T = never> extends Sco
     this.editor = this.area.parentScope<NodeEditor<Schemes>>(NodeEditor)
 
     const props = { editor: this.editor, area: this.area }
-    const { padding, size, exclude } = this
+    const { padding, size, exclude, elder } = this
     const pickedNodes = getPickedNodes(this)
     const { translate, isTranslating } = trackedTranslate(props)
-    const agentParams = { padding, size, exclude, translate }
+    const agentParams = { padding, size, exclude, elder, translate }
 
     useValidator(props)
     useOrdering(props)

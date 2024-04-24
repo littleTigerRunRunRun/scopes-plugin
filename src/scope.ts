@@ -15,6 +15,7 @@ export async function reassignParent<T>(ids: NodeId[], pointer: { x: number, y: 
     .filter((n): n is ExpectedScheme['Node'] => Boolean(n))
 
   const overlayNodes = props.editor.getNodes()
+    .filter((node) => agentParams.elder(node.id))
     .map(node => {
       const view = props.area.nodeViews.get(node.id)
 
@@ -61,7 +62,11 @@ export async function reassignParent<T>(ids: NodeId[], pointer: { x: number, y: 
   }
 }
 
-export async function translateChildren<T>(id: NodeId, { position, previous }: { position: Position, previous: Position }, props: Props<T>) {
+export async function translateChildren<T>(
+  id: NodeId,
+  { position, previous }: { position: Position, previous: Position },
+  props: Props<T>
+) {
   const children = props.editor.getNodes().filter(n => n.parent === id)
 
   await Promise.all(children.map(async n => {

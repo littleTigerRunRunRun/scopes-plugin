@@ -10,6 +10,12 @@ export type AgentContext<T> = {
   area: BaseAreaPlugin<ExpectedScheme, BaseArea<ExpectedScheme> | T>
   scopes: Scope<Scopes, [BaseArea<ExpectedScheme>, Root<ExpectedScheme>]>
 }
-export type AgentParams = { padding: (id: NodeId) => Padding, size: (id: NodeId, size: Size) => Size, exclude: (id: NodeId) => boolean, translate: Translate }
+export type AgentParams = {
+  padding: (id: NodeId) => Padding,
+  size: (id: NodeId, size: Size) => Size,
+  exclude: (id: NodeId) => boolean,
+  elder: (id: NodeId) => boolean,
+  translate: Translate
+}
 
 export type ScopeAgent = <T>(params: AgentParams, context: AgentContext<T>) => void
