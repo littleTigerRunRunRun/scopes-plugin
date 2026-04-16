@@ -49,35 +49,40 @@ export function updateNodeSizes<T>(node: ExpectedScheme['Node'], size: Size, { a
 
 // eslint-disable-next-line max-statements
 export async function resizeParent<T>(parent: ExpectedScheme['Node'], agentParams: AgentParams, props: Props<T>) {
-  const { id } = parent
-  const children = props.editor.getNodes()
-    .filter(child => child.parent === id)
-    .filter(node => !agentParams.exclude(node.id))
-  const padding = agentParams.padding(id)
+  // const { id } = parent
+  // const children = props.editor.getNodes()
+  //   .filter(child => child.parent === id)
+  //   .filter(node => !agentParams.exclude(node.id))
+  // const padding = agentParams.padding(id)
 
-  if (children.length === 0) {
-    const size = agentParams.size(id, {
-      width: padding.left + padding.right,
-      height: padding.top + padding.bottom
-    })
+  // if (children.length === 0) {
+  //   const size = agentParams.size(id, {
+  //     width: padding.left + padding.right,
+  //     height: padding.top + padding.bottom
+  //   })
 
-    updateNodeSizes(parent, size, props)
-  } else {
-    const { top, left, width, height } = getNodesBoundingBox(children, props)
+  //   updateNodeSizes(parent, size, props)
+  // } else {
+  //   const { top, left, width, height } = getNodesBoundingBox(children, props)
 
-    const outerWidth = width + padding.left + padding.right
-    const outerHeight = height + padding.top + padding.bottom
-    const outerTop = top - padding.top
-    const outerLeft = left - padding.left
+  //   const outerWidth = width + padding.left + padding.right
+  //   const outerHeight = height + padding.top + padding.bottom
+  //   const outerTop = top - padding.top
+  //   const outerLeft = left - padding.left
 
-    updateNodeSizes(parent, agentParams.size(id, { width: outerWidth, height: outerHeight }), props)
-    await agentParams.translate(parent.id, outerLeft, outerTop)
-  }
-  if (parent.parent) {
-    const parentsParent = props.editor.getNode(parent.parent)
+  //   updateNodeSizes(parent, agentParams.size(id, { width: outerWidth, height: outerHeight }), props)
+  //   await agentParams.translate(parent.id, outerLeft, outerTop)
+  // }
+  // if (parent.parent) {
+  //   const parentsParent = props.editor.getNode(parent.parent)
 
-    if (parentsParent) {
-      await resizeParent(parentsParent, agentParams, props)
-    }
+  //   if (parentsParent) {
+  //     await resizeParent(parentsParent, agentParams, props)
+  //   }
+  // }
+  return {
+    parent,
+    agentParams,
+    props
   }
 }
