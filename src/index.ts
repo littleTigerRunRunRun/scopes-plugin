@@ -1,7 +1,7 @@
 import { NodeEditor, NodeId, Root, Scope } from 'rete'
 import { BaseArea, BaseAreaPlugin } from 'rete-area-plugin'
 
-import { useOrdering } from './ordering'
+import { useOrdering, bringForward } from './ordering'
 import { Preset } from './presets/types'
 import { translateChildren } from './scope'
 import { resizeParent } from './sizing'
@@ -150,6 +150,10 @@ export class ScopesPlugin<Schemes extends ExpectedScheme, T = never> extends Sco
 
   public async update(scopeId: NodeId) {
     await this.emit({ type: 'scopeupdated', data: { id: scopeId } })
+  }
+
+  public reorder(parentId: NodeId) {
+    bringForward(parentId, { editor: this.editor, area: this.area })
   }
 }
 

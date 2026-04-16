@@ -22,7 +22,7 @@ function bringConnectionBack<T>(id: ConnectionId, props: Props<T>) {
   }
 }
 
-function bringForward<T>(nodeId: NodeId, props: Props<T>) {
+export function bringForward<T>(nodeId: NodeId, props: Props<T>) {
   const view = props.area.nodeViews.get(nodeId)
   const connections = props.editor.getConnections().filter(c => {
     return nodeId === c.source || nodeId === c.target
