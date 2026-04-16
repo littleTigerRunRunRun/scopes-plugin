@@ -15,6 +15,7 @@ export async function reassignParent<T>(ids: NodeId[], pointer: { x: number, y: 
     .filter((n): n is ExpectedScheme['Node'] => Boolean(n))
 
   const overlayNodes = props.editor.getNodes()
+    .filter((node) => agentParams.elder(node.id))
     .map(node => {
       const view = props.area.nodeViews.get(node.id)
 

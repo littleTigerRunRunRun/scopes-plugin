@@ -58,13 +58,15 @@ export const useScopeAgent: ScopeAgent = (params: DefaultScopesAgentParams, { ar
       const { pointer } = area.area
       const ids = release()
 
+      if (ids.length === 0) return
+
       await reassignParent(ids, pointer, params, { area, editor })
     }
     return context
   })
 }
 
-export function useVisualEffects<T>({ area, editor, scopes }: AgentContext<T>): void {
+export function useVisualEffects<T>(params: DefaultScopesAgentParams, { area, editor, scopes }: AgentContext<T>): void {
   const pickedNodes = getPickedNodes(scopes)
   let previousHighlighted: string | null = null
   let clientPointerPostion: Position | null = null
@@ -80,7 +82,9 @@ export function useVisualEffects<T>({ area, editor, scopes }: AgentContext<T>): 
     if (nodes.length) {
       const { x, y } = position
       const elements = document.elementsFromPoint(x, y)
-      const nodeViews = editor.getNodes().map(node => {
+      const nodeViews = editor.getNodes().filter(node => {
+        return params.elder(node.id)
+      }).map(node => {
         const view = area.nodeViews.get(node.id)
 
         if (!view) throw new Error('view')
